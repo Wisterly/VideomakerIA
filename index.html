@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VideomakerI.A - AI Video Studio & Prompt Gallery</title>
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="VideomakerIA">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">🎬</div>
+      <div>
+        <h1>Videomaker<span>I.A</span></h1>
+        <small style="color: var(--text-secondary); font-size: 0.75rem;">Seedance 2.5 • Kling • Luma</small>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="btn-pwa-install" style="display: none;">
+        📲 <span>Instalar App</span>
+      </button>
+      <button class="btn-icon" id="btn-open-settings">
+        🔑 <span>API Key</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="container">
+
+    <!-- Left Column: Input Studio & Prompt Catalog -->
+    <div class="panel">
+      <h2 class="panel-title">📸 1. Foto de Referência (Image-to-Video)</h2>
+      
+      <!-- Dropzone -->
+      <div class="upload-dropzone" id="dropzone">
+        <input type="file" id="file-input" accept="image/png, image/jpeg, image/webp">
+        <div class="dropzone-content" id="dropzone-text">
+          <div class="dropzone-icon">📥</div>
+          <strong>Arraste sua foto aqui ou clique</strong>
+          <small style="color: var(--text-secondary);">Formatos: PNG, JPG, WEBP (Retrato ou Paisagem)</small>
+        </div>
+        <img id="image-preview" class="upload-preview" alt="Preview da Foto">
+        <div class="upload-overlay" id="upload-overlay">Clique para trocar a foto</div>
+      </div>
+
+      <!-- Model Selector -->
+      <div class="form-group">
+        <label class="form-label">🤖 Modelo de Vídeo com IA</label>
+        <div class="model-grid">
+          <div class="model-card active" data-model="seedance">
+            <span class="model-name">ByteDance Seedance 2.5</span>
+            <span class="model-badge">Foco: Rosto e Identidade Perfeita</span>
+          </div>
+          <div class="model-card" data-model="kling">
+            <span class="model-name">Kling AI 1.5</span>
+            <span class="model-badge">Foco: Cinema & Movimento Fluido</span>
+          </div>
+          <div class="model-card" data-model="minimax">
+            <span class="model-name">Minimax Hailuo</span>
+            <span class="model-badge">Foco: Física Realista & Ultra Rápido</span>
+          </div>
+          <div class="model-card" data-model="luma">
+            <span class="model-name">Luma Dream Machine</span>
+            <span class="model-badge">Foco: Câmera Cinemática 3D</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Presets / Gallery with Mini-video Previews -->
+      <div class="form-group">
+        <label class="form-label">✨ Galeria de Estilos & Prompts Prontos (Clique para usar)</label>
+        <div class="presets-carousel" id="presets-container">
+          <!-- Os cards de prompts com mini vídeos são injetados pelo app.js -->
+        </div>
+      </div>
+
+      <!-- Prompt Input -->
+      <div class="form-group">
+        <label class="form-label">✍️ Roteiro do Vídeo (Prompt de Movimento)</label>
+        <textarea id="prompt-input" placeholder="Descreva o movimento da câmera, expressão facial ou ação (Ex: A pessoa olha para a câmera com um sorriso sutil enquanto uma brisa suave balança o cabelo, zoom in cinematográfico...)"></textarea>
+      </div>
+
+      <!-- Motion Modifiers Tags -->
+      <div class="form-group">
+        <label class="form-label">🎯 Gatilhos Rápidos de Câmera e Efeitos</label>
+        <div class="tags-wrapper">
+          <button class="tag-btn" data-tag="Slow-motion suave 60fps">⏱️ Slow Motion</button>
+          <button class="tag-btn" data-tag="Câmera lenta com Dolly-in sutil">🎥 Zoom In Lento</button>
+          <button class="tag-btn" data-tag="Giro orbital suave 360 ao redor">🔄 Giro 360°</button>
+          <button class="tag-btn" data-tag="Vento suave balançando o cabelo e roupas">💨 Vento Natural</button>
+          <button class="tag-btn" data-tag="Iluminação dourada de pôr do sol cinemática">🌅 Golden Hour</button>
+          <button class="tag-btn" data-tag="Expressão natural piscando e sorrindo com confiança">😊 Sorriso Confiante</button>
+        </div>
+      </div>
+
+      <button id="btn-generate" class="btn-generate">
+        <span>🚀 Gerar Vídeo com IA</span>
+      </button>
+    </div>
+
+    <!-- Right Column: Video Player Stage -->
+    <div class="panel">
+      <h2 class="panel-title">🎥 2. Estúdio de Renderização</h2>
+      
+      <div class="stage-container" id="stage-box">
+        <!-- Placeholder Inicial -->
+        <div class="stage-placeholder" id="stage-empty">
+          <div style="font-size: 3rem;">🎞️</div>
+          <h3>Nenhum vídeo em reprodução</h3>
+          <p style="font-size: 0.85rem; max-width: 320px; text-align: center;">
+            Faça upload da foto, selecione ou digite o seu prompt e clique em gerar para assistir a criação.
+          </p>
+        </div>
+
+        <!-- Loader / Renderizando -->
+        <div class="stage-loader" id="stage-loading">
+          <div class="spinner"></div>
+          <h3 id="loader-status">Renderizando vídeo pela IA...</h3>
+          <p style="font-size: 0.8rem; color: var(--text-secondary);">Calculando física, iluminação e movimentos...</p>
+        </div>
+
+        <!-- Vídeo Gerado -->
+        <video id="stage-video" class="stage-video" controls autoplay loop playsinline></video>
+      </div>
+
+      <!-- Action Buttons for Video -->
+      <div class="video-actions" id="video-actions" style="display: none;">
+        <a id="btn-download-video" class="btn-icon" style="flex: 1; justify-content: center; background: var(--success);" download="video_ai.mp4">
+          ⬇️ <span>Baixar Vídeo (.MP4)</span>
+        </a>
+        <button id="btn-fullscreen" class="btn-icon">
+          ⛶ <span>Tela Cheia</span>
+        </button>
+      </div>
+
+      <!-- Histórico de Gerações -->
+      <div class="form-group" style="margin-top: 1rem;">
+        <label class="form-label">🕒 Histórico de Vídeos Gerados</label>
+        <div id="history-list" class="history-grid">
+          <p style="color: var(--text-secondary); font-size: 0.85rem;" id="no-history-text">Nenhum vídeo gerado ainda nesta sessão.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal API Key -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>🔑 Conexão com Modelos IA</h3>
+        <button class="modal-close" id="btn-close-modal">✕</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-secondary);">
+        Para gerar vídeos com Seedance 2.5, Kling 1.5 ou Luma na nuvem, você pode inserir sua chave de API (Fal.ai ou Replicate). A chave fica salva no seu próprio navegador e nunca é compartilhada.
+      </p>
+      <div class="form-group">
+        <label class="form-label">Chave de API (Fal.ai ou Replicate Token)</label>
+        <input type="password" id="api-key-input" placeholder="fal_... ou r8_..." style="background: var(--bg-input); border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px; color: white;">
+      </div>
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem;">
+        <button class="btn-icon" id="btn-save-key" style="background: var(--primary);">Salvar Conexão</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

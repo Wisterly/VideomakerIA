@@ -1,0 +1,24 @@
+{
+  "name": "videomaker-ia",
+  "version": "1.0.0",
+  "description": "Estúdio de Criação de Vídeos por IA com suporte a Seedance, Kling, Luma e PWA Mobile 24/7",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -l 3000",
+    "dev": "npx serve . -l 3000"
+  },
+  "keywords": [
+    "ai-video",
+    "seedance",
+    "kling",
+    "sora",
+    "image-to-video",
+    "pwa",
+    "vercel"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "serve": "^14.2.4"
+  }
+}
