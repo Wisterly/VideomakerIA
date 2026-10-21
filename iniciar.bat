@@ -10,9 +10,15 @@ set CHROME="C:\Program Files\Google\Chrome\Application\chrome.exe"
 set EDGE="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 set APP_HTML="%~dp0index.html"
 
+:: Inicia o motor de IA local GPU (FastAPI + PyTorch CUDA na porta 8000)
+set PYTHON="C:\Users\Lenovo\AppData\Local\Programs\Python\Python310\python.exe"
+if exist %PYTHON% (
+    start /b "" %PYTHON% "%~dp0engine_gpu.py" >nul 2>&1
+)
+
 :: Inicia o servidor local silenciosamente em segundo plano
 start /b cmd /c "call npx.cmd serve "%~dp0" -l 3000 >nul 2>&1"
-timeout /t 1 /nobreak >nul
+timeout /t 2 /nobreak >nul
 
 :: Se o Chrome existir, abre como janela de aplicativo nativo (sem abas, sem barra de URL)
 if exist %CHROME% (

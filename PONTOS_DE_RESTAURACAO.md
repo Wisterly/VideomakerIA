@@ -18,6 +18,32 @@ Registro histórico de versões e pontos de recuperação para segurança e roll
 
 ---
 
+## 📌 [PR.003] - IMPLEMENTAÇÃO DO MOTOR LOCAL COM IA NA GPU (OPÇÃO A)
+- **Data e Hora:** 21/10/2026 - 01:13
+- **Identificador:** PR.003
+- **Hash do Commit:** *(Sincronizando com a branch main)*
+- **Repositório GitHub:** https://github.com/Wisterly/VideomakerIA
+- **Deploy Vercel:** https://videomaker-ia.vercel.app
+- **Ambiente:** Desktop App Nativo + Motor Local GPU PyTorch CUDA 12.1 + Vercel
+- **Status:** Motor local ativo na porta 8000 na GPU NVIDIA GeForce RTX 4050 Laptop (6 GB VRAM).
+
+### 📦 O que foi criado e implementado:
+1. **Configuração do Motor Local de IA (Opção A):**
+   - Instalado **PyTorch 2.5.1 + CUDA 12.1** e **Torchvision** no Python 3.10 com detecção validada da RTX 4050 Laptop (6.0 GB VRAM).
+   - Criado [engine_gpu.py](file:///c:/Users/Lenovo/Documents/antigravity/VideomakerI.A/engine_gpu.py) com FastAPI na porta 8000:
+     - Decodificação da foto real do usuário.
+     - Conversão para tensores e processamento em lote acelerado via núcleos CUDA.
+     - Cálculo de dinâmica de movimento e física de acordo com o prompt digitado (dolly-in, zoom, giro orbital, vento natural, variações de iluminação).
+     - Codificação do vídeo `.mp4` com H.264 web standard e retorno direto em stream Base64.
+2. **Remoção Completa do Vídeo Estático de Exemplo no Gerador:**
+   - O [app.js](file:///c:/Users/Lenovo/Documents/antigravity/VideomakerI.A/app.js) agora envia a foto enviada pelo usuário diretamente para o motor GPU local (`http://127.0.0.1:8000/generate`), renderizando o vídeo a partir da imagem real do usuário.
+3. **Inicialização Automatizada de 1 Clique:**
+   - O arquivo [iniciar.bat](file:///c:/Users/Lenovo/Documents/antigravity/VideomakerI.A/iniciar.bat) agora inicializa o motor de IA em segundo plano automaticamente antes de abrir a janela do aplicativo nativo.
+4. **Regra de Transição para Opção B:**
+   - O comando `opção B` (ou `Opção B`) ficou acordado para ativar a infraestrutura externa em nuvem caso desejado.
+
+---
+
 ## 📌 [PR.002] - MINIATURAS DE VÍDEO OTIMIZADAS NA GALERIA DE PROMPTS
 - **Data e Hora:** 21/10/2026 - 00:54
 - **Identificador:** PR.002

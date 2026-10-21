@@ -267,18 +267,39 @@ function initGenerationEngine() {
     btnGenerate.disabled = true;
 
     try {
-      const apiKey = localStorage.getItem('ai_video_api_key');
       let resultVideoUrl = '';
 
-      // Se o usuário já cadastrou a chave da API (ex: Fal.ai / Replicate):
-      if (apiKey) {
-        // Disparo real via API
-        resultVideoUrl = await requestCloudVideo(apiKey, uploadedImageBase64, promptText, selectedModel);
-      } else {
-        // Demonstração local instantânea com renderizador de exemplo calibrado
-        await new Promise(r => setTimeout(r, 3500));
-        // Seleciona um vídeo de demonstração em alta definição correspondente ao estilo
-        resultVideoUrl = PROMPT_PRESETS[Math.floor(Math.random() * PROMPT_PRESETS.length)].previewVideo;
+      // Tenta primeiro o Motor Local com PyTorch e CUDA na RTX 4050 (Opção A)
+      try {
+        const localRes = await fetch('http://127.0.0.1:8000/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_base64: uploadedImageBase64,
+            prompt: promptText,
+            model: selectedModel,
+            num_frames: 90,
+            fps: 30
+          })
+        });
+
+        if (localRes.ok) {
+          const data = await localRes.json();
+          resultVideoUrl = data.video_base64;
+          console.log(`✓ Vídeo gerado com sucesso via GPU Local (${data.device}) em ${data.elapsed_seconds}s!`);
+        }
+      } catch (localErr) {
+        console.warn('Motor Local GPU (porta 8000) não respondeu, verificando outras conexões...', localErr);
+      }
+
+      // Se o motor local não gerou e há chave de API em nuvem (Opção B):
+      if (!resultVideoUrl) {
+        const apiKey = localStorage.getItem('ai_video_api_key');
+        if (apiKey) {
+          resultVideoUrl = await requestCloudVideo(apiKey, uploadedImageBase64, promptText, selectedModel);
+        } else {
+          throw new Error('O motor local da GPU não está em execução. Execute "iniciar.bat" para inicializar a IA local na sua RTX 4050!');
+        }
       }
 
       // Sucesso na Renderização

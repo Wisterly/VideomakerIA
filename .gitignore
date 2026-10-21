@@ -4,6 +4,7 @@ node_modules/
 .vercel
 dist/
 build/
+outputs/
 .DS_Store
 Thumbs.db
 
