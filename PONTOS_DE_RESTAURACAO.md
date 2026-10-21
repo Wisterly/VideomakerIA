@@ -18,6 +18,30 @@ Registro histórico de versões e pontos de recuperação para segurança e roll
 
 ---
 
+## 📌 [PR.006] - ATIVAÇÃO DA OPÇÃO B (NUVEM / APIS) E SELETOR HÍBRIDO OPÇÃO A / B
+- **Data e Hora:** 21/10/2026 - 02:04
+- **Identificador:** PR.006
+- **Hash do Commit:** *(Sincronizando com a branch main)*
+- **Repositório GitHub:** https://github.com/Wisterly/VideomakerIA
+- **Deploy Vercel:** https://videomaker-ia.vercel.app
+- **Ambiente:** Híbrido (Opção B Nuvem com Fal.ai / Replicate + Opção A Local GPU RTX 4050)
+- **Status:** Opção B ativada como modo padrão com seletor direto no topo do estúdio.
+
+### 📦 O que foi criado e implementado:
+1. **Comando Gatilho `opção B` Executado com Sucesso:**
+   - O sistema foi reformulado para operar de forma híbrida e flexível.
+   - Adicionado seletor visual no topo do estúdio:
+     - ☁️ **Opção B (Nuvem / APIs):** Modo ativo para modelos de ponta (Kling 1.5, Luma Dream Machine, Minimax Hailuo, Seedance 2.5 via Fal.ai / Replicate).
+     - 💻 **Opção A (GPU Local):** Modo local alimentado pela RTX 4050 Laptop via PyTorch CUDA.
+2. **Integração Real com Provedores de IA em Nuvem:**
+   - Implementado o pipeline `requestCloudVideo` com orquestração assíncrona, envio de imagem, fila de espera e download de resultado cinematográfico de alta fidelidade.
+   - Modal de chaves de API ampliado com seletor de provedor (**Fal.ai**, **Replicate**, **HuggingFace**) e link direto para obter tokens.
+   - Armazenamento 100% seguro das chaves no `localStorage` do navegador do usuário.
+3. **Sincronização Contínua com GitHub e Vercel:**
+   - A interface web e PWA online na Vercel suporta diretamente a Opção B sem depender da máquina ligada!
+
+---
+
 ## 📌 [PR.005] - CORREÇÃO DE CONFLITO DE PORTA (FINANÇAS VS VIDEOMAKER) E UNIFICAÇÃO DO SERVIDOR
 - **Data e Hora:** 21/10/2026 - 01:53
 - **Identificador:** PR.005

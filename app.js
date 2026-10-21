@@ -48,6 +48,7 @@ const PROMPT_PRESETS = [
 ];
 
 // Estado da Aplicação
+let currentEngineMode = localStorage.getItem('videomaker_engine_mode') || 'cloud'; // 'cloud' (Opção B) ou 'local' (Opção A)
 let selectedModel = 'seedance';
 let uploadedImageBase64 = null;
 let deferredPrompt = null;
@@ -57,12 +58,38 @@ const videoHistory = [];
 document.addEventListener('DOMContentLoaded', () => {
   initPresetsGallery();
   initUploadDropzone();
+  initModeToggle();
   initModelSelector();
   initTags();
   initSettingsModal();
   initPWA();
   initGenerationEngine();
 });
+
+// Toggle entre Opção A (Local GPU) e Opção B (Nuvem / APIs)
+function initModeToggle() {
+  const btnCloud = document.getElementById('btn-mode-cloud');
+  const btnLocal = document.getElementById('btn-mode-local');
+
+  function updateModeUI(mode) {
+    currentEngineMode = mode;
+    localStorage.setItem('videomaker_engine_mode', mode);
+
+    if (mode === 'cloud') {
+      btnCloud.classList.add('active');
+      btnLocal.classList.remove('active');
+    } else {
+      btnLocal.classList.add('active');
+      btnCloud.classList.remove('active');
+    }
+  }
+
+  if (btnCloud && btnLocal) {
+    btnCloud.addEventListener('click', () => updateModeUI('cloud'));
+    btnLocal.addEventListener('click', () => updateModeUI('local'));
+    updateModeUI(currentEngineMode);
+  }
+}
 
 // 1. Renderiza a Galeria de Prompts com Mini-Vídeos
 function initPresetsGallery() {
@@ -205,16 +232,20 @@ function initTags() {
   });
 }
 
-// 5. Configuração e Chave de API
+// 5. Configuração e Chave de API (Opção B)
 function initSettingsModal() {
   const modal = document.getElementById('modal-settings');
   const btnOpen = document.getElementById('btn-open-settings');
   const btnClose = document.getElementById('btn-close-modal');
   const btnSave = document.getElementById('btn-save-key');
   const keyInput = document.getElementById('api-key-input');
+  const providerSelect = document.getElementById('api-provider-select');
 
   const savedKey = localStorage.getItem('ai_video_api_key') || '';
+  const savedProvider = localStorage.getItem('ai_video_provider') || 'fal';
+
   keyInput.value = savedKey;
+  if (providerSelect) providerSelect.value = savedProvider;
 
   btnOpen.addEventListener('click', () => modal.style.display = 'flex');
   btnClose.addEventListener('click', () => modal.style.display = 'none');
@@ -223,9 +254,26 @@ function initSettingsModal() {
   });
 
   btnSave.addEventListener('click', () => {
-    localStorage.setItem('ai_video_api_key', keyInput.value.trim());
+    const key = keyInput.value.trim();
+    const provider = providerSelect ? providerSelect.value : 'fal';
+    
+    localStorage.setItem('ai_video_api_key', key);
+    localStorage.setItem('ai_video_provider', provider);
+    
+    // Automaticamente migra e ativa o modo nuvem (Opção B)
+    if (key) {
+      currentEngineMode = 'cloud';
+      localStorage.setItem('videomaker_engine_mode', 'cloud');
+      const btnCloud = document.getElementById('btn-mode-cloud');
+      const btnLocal = document.getElementById('btn-mode-local');
+      if (btnCloud && btnLocal) {
+        btnCloud.classList.add('active');
+        btnLocal.classList.remove('active');
+      }
+    }
+
     modal.style.display = 'none';
-    alert('Conexão e chave de API salvas com sucesso no seu navegador!');
+    alert(`Opção B Ativada! Provedor [${provider.toUpperCase()}] configurado com sucesso!`);
   });
 }
 
@@ -269,39 +317,44 @@ function initGenerationEngine() {
     try {
       let resultVideoUrl = '';
 
-      // Tenta primeiro o Motor Local com PyTorch e CUDA na RTX 4050 (Opção A)
-      try {
-        const localRes = await fetch('http://127.0.0.1:8000/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image_base64: uploadedImageBase64,
-            prompt: promptText,
-            model: selectedModel,
-            num_frames: 90,
-            fps: 30
-          })
-        });
-
-        if (localRes.ok) {
-          const data = await localRes.json();
-          resultVideoUrl = data.video_base64;
-          console.log(`✓ Vídeo gerado com sucesso via GPU Local (${data.device}) em ${data.elapsed_seconds}s!`);
-        } else {
-          const errDetail = await localRes.text();
-          console.error('Falha no motor local:', errDetail);
-        }
-      } catch (localErr) {
-        console.warn('Motor Local GPU (porta 8000) não respondeu:', localErr);
-      }
-
-      // Se o motor local não gerou e há chave de API em nuvem (Opção B):
-      if (!resultVideoUrl) {
+      // ROTA 1: OPÇÃO B (Nuvem / APIs de Alta Resolução: Fal.ai, Replicate, HF)
+      if (currentEngineMode === 'cloud') {
         const apiKey = localStorage.getItem('ai_video_api_key');
-        if (apiKey) {
-          resultVideoUrl = await requestCloudVideo(apiKey, uploadedImageBase64, promptText, selectedModel);
-        } else {
-          throw new Error('O motor local da GPU não respondeu. Certifique-se de iniciar o app pelo atalho da Área de Trabalho ou iniciar.bat para que o motor na sua RTX 4050 fique ativo!');
+        const provider = localStorage.getItem('ai_video_provider') || 'fal';
+
+        if (!apiKey) {
+          // Abre o modal para o usuário inserir a chave se ainda não inseriu
+          document.getElementById('modal-settings').style.display = 'flex';
+          throw new Error('Você está no modo Opção B (Nuvem). Por favor, insira sua chave de API (Fal.ai ou Replicate) para disparar a IA externa!');
+        }
+
+        resultVideoUrl = await requestCloudVideo(apiKey, uploadedImageBase64, promptText, selectedModel, provider);
+      } 
+      // ROTA 2: OPÇÃO A (GPU Local com PyTorch CUDA)
+      else {
+        try {
+          const localRes = await fetch('http://127.0.0.1:8000/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image_base64: uploadedImageBase64,
+              prompt: promptText,
+              model: selectedModel,
+              num_frames: 90,
+              fps: 30
+            })
+          });
+
+          if (localRes.ok) {
+            const data = await localRes.json();
+            resultVideoUrl = data.video_base64;
+            console.log(`✓ Vídeo gerado via GPU Local (${data.device}) em ${data.elapsed_seconds}s!`);
+          } else {
+            const errDetail = await localRes.text();
+            throw new Error(`Falha no motor local: ${errDetail}`);
+          }
+        } catch (localErr) {
+          throw new Error('O motor local da GPU não respondeu na porta 8000. Inicie pelo atalho da Área de Trabalho ou mude para a "Opção B (Nuvem)" no topo!');
         }
       }
 
@@ -366,6 +419,110 @@ function downloadBase64Video(base64Data, filename) {
     tempLink.click();
     tempLink.remove();
   }
+}
+
+// Chamada para APIs de Nuvem (Opção B: Fal.ai, Replicate, etc)
+async function requestCloudVideo(apiKey, imageBase64, prompt, model, provider = 'fal') {
+  const statusEl = document.getElementById('loader-status');
+  if (statusEl) statusEl.innerText = `Enviando requisição para ${provider.toUpperCase()} (${model.toUpperCase()})...`;
+
+  if (provider === 'fal') {
+    // Mapeamento dos endpoints no Fal.ai
+    let endpoint = 'fal-ai/kling-video/v1/standard/image-to-video';
+    if (model === 'luma') endpoint = 'fal-ai/luma-dream-machine/image-to-video';
+    else if (model === 'minimax') endpoint = 'fal-ai/minimax-video/image-to-video';
+    else if (model === 'seedance') endpoint = 'fal-ai/kling-video/v1.5/pro/image-to-video';
+
+    const submitRes = await fetch(`https://queue.fal.run/${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Key ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        image_url: imageBase64
+      })
+    });
+
+    if (!submitRes.ok) {
+      const err = await submitRes.text();
+      throw new Error(`Fal.ai erro HTTP ${submitRes.status}: ${err}`);
+    }
+
+    const submitData = await submitRes.json();
+    const requestId = submitData.request_id;
+    const statusUrl = submitData.status_url || `https://queue.fal.run/${endpoint}/requests/${requestId}/status`;
+    const responseUrl = submitData.response_url || `https://queue.fal.run/${endpoint}/requests/${requestId}`;
+
+    // Polling de status do vídeo na nuvem
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 4000));
+      if (statusEl) statusEl.innerText = `Renderizando vídeo cinematográfico na Nuvem... (${(i + 1) * 4}s)`;
+
+      const pollRes = await fetch(statusUrl, {
+        headers: { 'Authorization': `Key ${apiKey}` }
+      });
+      const pollData = await pollRes.json();
+
+      if (pollData.status === 'COMPLETED') {
+        const finalRes = await fetch(responseUrl, {
+          headers: { 'Authorization': `Key ${apiKey}` }
+        });
+        const finalData = await finalRes.json();
+        const videoObj = finalData.video || finalData.video_url || finalData.output;
+        return typeof videoObj === 'string' ? videoObj : (videoObj.url || '');
+      } else if (pollData.status === 'FAILED') {
+        throw new Error(`Falha no processamento da nuvem: ${JSON.stringify(pollData.error || pollData)}`);
+      }
+    }
+    throw new Error('Tempo limite excedido na nuvem (Timeout após 4 minutos).');
+  } 
+  
+  else if (provider === 'replicate') {
+    // Replicate direct model invocation
+    const submitRes = await fetch('https://api.replicate.com/v1/predictions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        version: "3f04d474d1a42fa0b731f358add0505757f315a6194537da9e517d69932cb0fa",
+        input: {
+          input_image: imageBase64,
+          prompt: prompt
+        }
+      })
+    });
+
+    if (!submitRes.ok) {
+      const err = await submitRes.text();
+      throw new Error(`Replicate erro HTTP ${submitRes.status}: ${err}`);
+    }
+
+    const pred = await submitRes.json();
+    const getUrl = pred.urls.get;
+
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 4000));
+      if (statusEl) statusEl.innerText = `Processando no Replicate... (${(i + 1) * 4}s)`;
+
+      const pollRes = await fetch(getUrl, {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+      const pollData = await pollRes.json();
+
+      if (pollData.status === 'succeeded') {
+        return Array.isArray(pollData.output) ? pollData.output[0] : pollData.output;
+      } else if (pollData.status === 'failed' || pollData.status === 'canceled') {
+        throw new Error(`Replicate falhou: ${pollData.error}`);
+      }
+    }
+    throw new Error('Tempo limite excedido no Replicate.');
+  }
+
+  throw new Error(`Provedor [${provider}] não implementado.`);
 }
 
 // Histórico de Vídeos Gerados

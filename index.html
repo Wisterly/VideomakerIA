@@ -26,6 +26,16 @@
       </div>
     </div>
     <div class="header-actions">
+      <!-- Seletor de Modo: Opção A (Local) vs Opção B (Nuvem) -->
+      <div class="mode-toggle-group" id="mode-toggle">
+        <button class="mode-toggle-btn active" id="btn-mode-cloud" data-mode="cloud">
+          ☁️ <span>Opção B (Nuvem / APIs)</span>
+        </button>
+        <button class="mode-toggle-btn" id="btn-mode-local" data-mode="local">
+          💻 <span>Opção A (GPU Local)</span>
+        </button>
+      </div>
+
       <button class="btn-icon" id="btn-pwa-install" style="display: none;">
         📲 <span>Instalar App</span>
       </button>
@@ -157,20 +167,34 @@
 
   <!-- Modal API Key -->
   <div class="modal-backdrop" id="modal-settings">
-    <div class="modal">
+    <div class="modal" style="max-width: 520px;">
       <div class="modal-header">
-        <h3>🔑 Conexão com Modelos IA</h3>
+        <h3>⚡ Provedor de Nuvem & Chaves de API (Opção B)</h3>
         <button class="modal-close" id="btn-close-modal">✕</button>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-secondary);">
-        Para gerar vídeos com Seedance 2.5, Kling 1.5 ou Luma na nuvem, você pode inserir sua chave de API (Fal.ai ou Replicate). A chave fica salva no seu próprio navegador e nunca é compartilhada.
+      <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">
+        Escolha o provedor de IA generativa para a <strong>Opção B</strong>. A chave é salva apenas localmente no seu navegador (<code style="color: #6366f1;">localStorage</code>) de forma segura:
       </p>
-      <div class="form-group">
-        <label class="form-label">Chave de API (Fal.ai ou Replicate Token)</label>
-        <input type="password" id="api-key-input" placeholder="fal_... ou r8_..." style="background: var(--bg-input); border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px; color: white;">
+
+      <div class="form-group" style="margin-top: 0.8rem;">
+        <label class="form-label">🌐 Provedor de IA em Nuvem</label>
+        <select id="api-provider-select" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px; color: white;">
+          <option value="fal">Fal.ai (ByteDance Seedance 2.5 / Kling 1.5 / Luma / Minimax)</option>
+          <option value="replicate">Replicate (Kling / Wan2.1 / SVD)</option>
+          <option value="huggingface">HuggingFace Inference API (Open Source)</option>
+        </select>
       </div>
-      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem;">
-        <button class="btn-icon" id="btn-save-key" style="background: var(--primary);">Salvar Conexão</button>
+
+      <div class="form-group">
+        <label class="form-label" id="api-key-label">Chave de API (Token Fal.ai / Replicate / HF)</label>
+        <input type="password" id="api-key-input" placeholder="Cole sua chave aqui (ex: fal_... ou r8_...)" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); padding: 0.75rem; border-radius: 8px; color: white;">
+        <small style="color: var(--text-secondary); display: block; margin-top: 0.4rem;">
+          💡 Dica: Obtenha créditos gratuitos de teste em <a href="https://fal.ai/dashboard/keys" target="_blank" style="color: #6366f1;">fal.ai</a> ou <a href="https://replicate.com/account/api-tokens" target="_blank" style="color: #6366f1;">replicate.com</a>.
+        </small>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
+        <button class="btn-icon" id="btn-save-key" style="background: var(--primary); font-weight: 600;">Salvar e Ativar Opção B</button>
       </div>
     </div>
   </div>
