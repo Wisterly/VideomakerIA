@@ -18,6 +18,28 @@ Registro histórico de versões e pontos de recuperação para segurança e roll
 
 ---
 
+## 📌 [PR.005] - CORREÇÃO DE CONFLITO DE PORTA (FINANÇAS VS VIDEOMAKER) E UNIFICAÇÃO DO SERVIDOR
+- **Data e Hora:** 21/10/2026 - 01:53
+- **Identificador:** PR.005
+- **Hash do Commit:** *(Sincronizando com a branch main)*
+- **Repositório GitHub:** https://github.com/Wisterly/VideomakerIA
+- **Deploy Vercel:** https://videomaker-ia.vercel.app
+- **Ambiente:** Desktop App Nativo + Servidor Unificado GPU (Porta 8000)
+- **Status:** Conflito de portas solucionado com 100% de isolamento do aplicativo anterior.
+
+### 📦 O que foi diagnosticado e corrigido:
+1. **Origem do Problema Identificada:**
+   - O projeto anterior `C:\Users\Lenovo\Documents\antigravity\Finanças` estava rodando silenciosamente via Vite na porta `3000`.
+   - Quando o Videomaker abria `localhost:3000`, o navegador caía na tela do projeto de Finanças por causa da porta ocupada.
+2. **Solução Definitiva (Servidor Unificado):**
+   - O [engine_gpu.py](file:///c:/Users/Lenovo/Documents/antigravity/VideomakerI.A/engine_gpu.py) agora é o **único servidor central** rodando na porta `8000`:
+     - Entrega tanto a interface visual completa do **VideomakerI.A** quanto a API de Inteligência Artificial na GPU.
+     - Zero conflito com o projeto de Finanças ou qualquer outro aplicativo da máquina.
+3. **Teste e Validação:**
+   - Testada a rota `http://127.0.0.1:8000`, confirmando retorno `200 OK` e carregamento exclusivo do título `VideomakerI.A - AI Video Studio`.
+
+---
+
 ## 📌 [PR.004] - CORREÇÃO DE ATALHO DE INICIALIZAÇÃO, MOTOR GPU E DOWNLOAD .MP4
 - **Data e Hora:** 21/10/2026 - 01:35
 - **Identificador:** PR.004

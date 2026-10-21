@@ -2,34 +2,31 @@
 title VideomakerI.A - Modo Aplicativo Nativo
 color 0b
 
-:: Garante diretorio do script
+:: Garante diretorio raiz do projeto
 cd /d "%~dp0"
 
 echo Iniciando VideomakerI.A como Aplicativo Nativo...
 
-:: Inicia o motor de IA local GPU (FastAPI + PyTorch CUDA na porta 8000)
+:: Inicia o Servidor Unificado (Frontend + Motor IA GPU PyTorch CUDA) na porta 8000
 set PYTHON="C:\Users\Lenovo\AppData\Local\Programs\Python\Python310\python.exe"
-if exist %PYTHON% (
-    start /b "" %PYTHON% "%~dp0engine_gpu.py" >nul 2>&1
-)
+start /b "" %PYTHON% "%~dp0engine_gpu.py" >nul 2>&1
 
-:: Inicia o servidor local silenciosamente em segundo plano
-start /b cmd /c "call npx.cmd serve "%~dp0" -l 3000 >nul 2>&1"
-timeout /t 2 /nobreak >nul
+:: Aguarda o servidor subir
+ping 127.0.0.1 -n 3 >nul
 
-:: Abre no modo App nativo limpo
+:: Abre no modo App nativo limpo na porta 8000 (Sem conflito de portas)
 set CHROME="C:\Program Files\Google\Chrome\Application\chrome.exe"
 set EDGE="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 
 if exist %CHROME% (
-    start "" %CHROME% --app="http://localhost:3000" --window-size=1366,850 --user-data-dir="%temp%\videomaker_ia_profile"
+    start "" %CHROME% --app="http://127.0.0.1:8000" --window-size=1366,850 --user-data-dir="%temp%\videomaker_ia_profile"
     exit
 )
 
 if exist %EDGE% (
-    start "" %EDGE% --app="http://localhost:3000" --window-size=1366,850 --user-data-dir="%temp%\videomaker_ia_profile"
+    start "" %EDGE% --app="http://127.0.0.1:8000" --window-size=1366,850 --user-data-dir="%temp%\videomaker_ia_profile"
     exit
 )
 
-start "" "http://localhost:3000"
+start "" "http://127.0.0.1:8000"
 exit
