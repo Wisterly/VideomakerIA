@@ -2,10 +2,27 @@
   "name": "videomaker-ia",
   "version": "1.0.0",
   "description": "Estúdio de Criação de Vídeos por IA com suporte a Seedance, Kling, Luma e PWA Mobile 24/7",
-  "main": "index.html",
+  "main": "main.js",
   "scripts": {
     "start": "npx serve . -l 3000",
-    "dev": "npx serve . -l 3000"
+    "dev": "npx serve . -l 3000",
+    "app": "electron .",
+    "dist": "electron-builder --win portable"
+  },
+  "build": {
+    "appId": "com.videomakeria.studio",
+    "productName": "VideomakerIA",
+    "win": {
+      "target": "portable",
+      "icon": "icon.png"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/**"
+    ],
+    "directories": {
+      "output": "dist"
+    }
   },
   "keywords": [
     "ai-video",
@@ -20,5 +37,9 @@
   "license": "MIT",
   "dependencies": {
     "serve": "^14.2.4"
+  },
+  "devDependencies": {
+    "electron": "^44.9.3",
+    "electron-builder": "^26.15.3"
   }
 }
