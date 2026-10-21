@@ -5,7 +5,8 @@ const PROMPT_PRESETS = [
     title: 'Retrato Cinematográfico',
     category: 'Pessoa / Retrato',
     prompt: 'Retrato cinematográfico em 4k. A pessoa olha diretamente para a câmera, pisca suavemente e dá um leve sorriso confiante. Iluminação suave de estúdio, vento sutil mexendo o cabelo, câmera lenta 60fps com dolly-in aproximando lentamente.',
-    previewVideo: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    previewVideo: 'assets/previews/portrait_smile.mp4',
+    poster: 'assets/previews/portrait_smile.jpg',
     badge: 'Seedance 2.5 Recomendado'
   },
   {
@@ -13,7 +14,8 @@ const PROMPT_PRESETS = [
     title: 'Pôr do Sol & Brisa',
     category: 'Cenário / Emoção',
     prompt: 'Iluminação dourada de pôr do sol (Golden Hour). A pessoa vira o rosto lentamente em direção à luz solar, olhos brilhando com reflexos realistas. Câmera orbital sutil girando ao redor, profundidade de campo rasa com fundo desfocado bokeh.',
-    previewVideo: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    previewVideo: 'assets/previews/golden_hour.mp4',
+    poster: 'assets/previews/golden_hour.jpg',
     badge: 'Kling 1.5 Recomendado'
   },
   {
@@ -21,7 +23,8 @@ const PROMPT_PRESETS = [
     title: 'Noite Urbana Neon',
     category: 'Estilo / Sci-Fi',
     prompt: 'Cenário noturno futurista com luzes neon azuis e magenta refletindo no rosto. A pessoa respira fundo enquanto gotas de chuva sutil caem em câmera lenta. Iluminação volumétrica dinâmica com névoa leve e foco nítido na expressão.',
-    previewVideo: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+    previewVideo: 'assets/previews/cyberpunk_neon.mp4',
+    poster: 'assets/previews/cyberpunk_neon.jpg',
     badge: 'Luma Dream Machine'
   },
   {
@@ -29,7 +32,8 @@ const PROMPT_PRESETS = [
     title: 'Virada Dinâmica de Câmera',
     category: 'Movimento / Ação',
     prompt: 'A câmera começa em ângulo lateral e faz um movimento rápido e fluido de chicote (whip pan) parando na frente da pessoa. A pessoa ajusta a jaqueta com determinação, olhar focado e postura firme, 8k resolução, hiper-realista.',
-    previewVideo: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4',
+    previewVideo: 'assets/previews/action_turn.mp4',
+    poster: 'assets/previews/action_turn.jpg',
     badge: 'Minimax Hailuo'
   },
   {
@@ -37,7 +41,8 @@ const PROMPT_PRESETS = [
     title: 'Natureza & Vento Forte',
     category: 'Ambiente Aberto',
     prompt: 'Ambiente montanhoso ao ar livre. Vento intenso agitando o cabelo e as roupas com física precisa e realista. A pessoa semicerra os olhos contra a luz do dia e olha para o horizonte, lente grande-angular cinematográfica.',
-    previewVideo: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
+    previewVideo: 'assets/previews/nature_wind.mp4',
+    poster: 'assets/previews/nature_wind.jpg',
     badge: 'Seedance 2.5 Recomendado'
   }
 ];
@@ -67,7 +72,16 @@ function initPresetsGallery() {
   container.innerHTML = PROMPT_PRESETS.map(preset => `
     <div class="preset-card" onclick="applyPreset('${preset.id}')">
       <div class="preset-video-wrapper">
-        <video src="${preset.previewVideo}" muted loop playsinline onmouseover="this.play()" onmouseout="this.pause()"></video>
+        <video 
+          src="${preset.previewVideo}" 
+          poster="${preset.poster}" 
+          muted 
+          loop 
+          playsinline 
+          preload="metadata"
+          onmouseenter="playPreviewVideo(this)" 
+          onmouseleave="pausePreviewVideo(this)">
+        </video>
         <span class="preset-hover-hint">▶ Passe o mouse</span>
       </div>
       <div class="preset-info">
@@ -79,6 +93,22 @@ function initPresetsGallery() {
       </div>
     </div>
   `).join('');
+}
+
+function playPreviewVideo(videoEl) {
+  if (videoEl) {
+    const playPromise = videoEl.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {});
+    }
+  }
+}
+
+function pausePreviewVideo(videoEl) {
+  if (videoEl) {
+    videoEl.pause();
+    videoEl.currentTime = 0;
+  }
 }
 
 // Aplica o prompt clicado diretamente no formulário

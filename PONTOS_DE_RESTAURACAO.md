@@ -18,6 +18,35 @@ Registro histórico de versões e pontos de recuperação para segurança e roll
 
 ---
 
+## 📌 [PR.002] - MINIATURAS DE VÍDEO OTIMIZADAS NA GALERIA DE PROMPTS
+- **Data e Hora:** 21/10/2026 - 00:54
+- **Identificador:** PR.002
+- **Hash do Commit:** *(Sincronizando com a branch main)*
+- **Repositório GitHub:** https://github.com/Wisterly/VideomakerIA
+- **Deploy Vercel:** https://videomaker-ia.vercel.app
+- **Ambiente:** Desktop App Nativo (.exe portátil) + PWA Mobile + Vercel
+- **Status:** Miniaturas de vídeo ultraleves renderizadas, integradas localmente e no `.exe`.
+
+### 📦 O que foi criado e implementado:
+1. **Renderização de Mini-Vídeos Procedurais para Cada Prompt:**
+   - Cada um dos 5 estilos/prompts da galeria ganhou seu vídeo representativo correspondente:
+     - `portrait_smile.mp4` (15.8 KB) + Poster `portrait_smile.jpg`
+     - `golden_hour.mp4` (18.1 KB) + Poster `golden_hour.jpg`
+     - `cyberpunk_neon.mp4` (23.1 KB) + Poster `cyberpunk_neon.jpg`
+     - `action_turn.mp4` (22.4 KB) + Poster `action_turn.jpg`
+     - `nature_wind.mp4` (10.8 KB) + Poster `nature_wind.jpg`
+2. **Otimização Extrema de Performance (Zero Lentidão):**
+   - Resolução calculada para card (480x270 a 30fps), compressão CRF 28 H.264 e sem trilha de áudio.
+   - Peso total dos 5 vídeos somados: **menos de 90 KB**!
+   - Imagens de poster embutidas para exibição estática instantânea antes do hover.
+   - Eventos `onmouseenter` e `onmouseleave` com tratamento seguro de promessas assíncronas do DOM.
+3. **PWA & Cache Offline Atualizado:**
+   - Versão do cache atualizada no `sw.js` para `videomaker-ia-v2`, pré-armazenando todas as miniaturas no celular e offline.
+4. **Atualização do Binário Executável (.exe):**
+   - O executável `dist\VideomakerIA 1.0.0.exe` e o atalho da Área de Trabalho foram recompilados com as miniaturas já integradas.
+
+---
+
 ## 📌 [PR.001] - IMPLEMENTAÇÃO DO EXECUTÁVEL NATIVO (.EXE) E ATALHO DESKTOP
 - **Data e Hora:** 21/10/2026 - 00:46
 - **Identificador:** PR.001
