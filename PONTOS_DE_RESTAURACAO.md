@@ -18,6 +18,29 @@ Registro histórico de versões e pontos de recuperação para segurança e roll
 
 ---
 
+## 📌 [PR.004] - CORREÇÃO DE ATALHO DE INICIALIZAÇÃO, MOTOR GPU E DOWNLOAD .MP4
+- **Data e Hora:** 21/10/2026 - 01:35
+- **Identificador:** PR.004
+- **Hash do Commit:** *(Sincronizando com a branch main)*
+- **Repositório GitHub:** https://github.com/Wisterly/VideomakerIA
+- **Deploy Vercel:** https://videomaker-ia.vercel.app
+- **Ambiente:** Desktop App Nativo (.exe) + Atalho VBS + Motor GPU PyTorch CUDA
+- **Status:** Atalho corrigido, motor GPU auto-iniciado e sistema de download via Blob ativado.
+
+### 📦 O que foi criado e implementado:
+1. **Correção do Atalho da Área de Trabalho:**
+   - O atalho da Área de Trabalho foi ajustado para executar o inicializador completo [VideomakerIA.vbs](file:///c:/Users/Lenovo/Documents/antigravity/VideomakerI.A/VideomakerIA.vbs) / [iniciar.bat](file:///c:/Users/Lenovo/Documents/antigravity/VideomakerI.A/iniciar.bat).
+   - Isso garante que o motor local de IA em Python (`engine_gpu.py`) suba na porta 8000 automaticamente junto com a interface do aplicativo.
+2. **Correção Definitiva do Download do Vídeo (.mp4):**
+   - Substituída a tag estática `<a>` por uma função JavaScript robusta (`downloadBase64Video`):
+     - Converte a string Base64 em um `Blob` binário real (`video/mp4`) de memória.
+     - Cria um link virtual temporário `URL.createObjectURL(blob)`.
+     - Dispara o download nativo do Windows com gravação limpa no disco sem corrupção ou travamento ao salvar na pasta de Downloads.
+3. **Recompilação do Executável (.exe):**
+   - O arquivo portátil [VideomakerIA 1.0.0.exe](file:///c:/Users/Lenovo/Documents/antigravity/VideomakerI.A/dist/VideomakerIA%201.0.0.exe) foi recompilado com todas as correções de download e interface.
+
+---
+
 ## 📌 [PR.003] - IMPLEMENTAÇÃO DO MOTOR LOCAL COM IA NA GPU (OPÇÃO A)
 - **Data e Hora:** 21/10/2026 - 01:13
 - **Identificador:** PR.003

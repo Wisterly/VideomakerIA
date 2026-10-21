@@ -287,9 +287,12 @@ function initGenerationEngine() {
           const data = await localRes.json();
           resultVideoUrl = data.video_base64;
           console.log(`✓ Vídeo gerado com sucesso via GPU Local (${data.device}) em ${data.elapsed_seconds}s!`);
+        } else {
+          const errDetail = await localRes.text();
+          console.error('Falha no motor local:', errDetail);
         }
       } catch (localErr) {
-        console.warn('Motor Local GPU (porta 8000) não respondeu, verificando outras conexões...', localErr);
+        console.warn('Motor Local GPU (porta 8000) não respondeu:', localErr);
       }
 
       // Se o motor local não gerou e há chave de API em nuvem (Opção B):
@@ -298,7 +301,7 @@ function initGenerationEngine() {
         if (apiKey) {
           resultVideoUrl = await requestCloudVideo(apiKey, uploadedImageBase64, promptText, selectedModel);
         } else {
-          throw new Error('O motor local da GPU não está em execução. Execute "iniciar.bat" para inicializar a IA local na sua RTX 4050!');
+          throw new Error('O motor local da GPU não respondeu. Certifique-se de iniciar o app pelo atalho da Área de Trabalho ou iniciar.bat para que o motor na sua RTX 4050 fique ativo!');
         }
       }
 
@@ -307,7 +310,11 @@ function initGenerationEngine() {
       stageVideo.src = resultVideoUrl;
       stageVideo.style.display = 'block';
       videoActions.style.display = 'flex';
-      btnDownload.href = resultVideoUrl;
+
+      // Configuração robusta de download de arquivo local (.mp4)
+      btnDownload.onclick = () => {
+        downloadBase64Video(resultVideoUrl, `VideomakerIA_${Date.now()}.mp4`);
+      };
 
       // Adiciona ao histórico
       addToHistory(resultVideoUrl, promptText, selectedModel);
@@ -320,6 +327,45 @@ function initGenerationEngine() {
       btnGenerate.disabled = false;
     }
   });
+}
+
+// Função universal para download de vídeo em base64 ou blob
+function downloadBase64Video(base64Data, filename) {
+  try {
+    const parts = base64Data.split(';base64,');
+    const contentType = parts[0].split(':')[1] || 'video/mp4';
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+
+    for (let i = 0; i < rawLength; ++i) {
+      uInt8Array[i] = raw.charCodeAt(i);
+    }
+
+    const blob = new Blob([uInt8Array], { type: contentType });
+    const blobUrl = URL.createObjectURL(blob);
+
+    const tempLink = document.createElement('a');
+    tempLink.href = blobUrl;
+    tempLink.download = filename;
+    tempLink.style.display = 'none';
+    document.body.appendChild(tempLink);
+    tempLink.click();
+
+    setTimeout(() => {
+      document.body.removeChild(tempLink);
+      window.URL.revokeObjectURL(blobUrl);
+    }, 1000);
+  } catch (err) {
+    console.error('Erro no download:', err);
+    // Fallback direto
+    const tempLink = document.createElement('a');
+    tempLink.href = base64Data;
+    tempLink.download = filename;
+    document.body.appendChild(tempLink);
+    tempLink.click();
+    tempLink.remove();
+  }
 }
 
 // Histórico de Vídeos Gerados

@@ -2,13 +2,10 @@
 title VideomakerI.A - Modo Aplicativo Nativo
 color 0b
 
-:: Fecha qualquer instância anterior para não acumular
-echo Iniciando VideomakerI.A como Aplicativo Nativo...
+:: Garante diretorio do script
+cd /d "%~dp0"
 
-:: Caminho para o Chrome ou Edge em modo App independente
-set CHROME="C:\Program Files\Google\Chrome\Application\chrome.exe"
-set EDGE="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-set APP_HTML="%~dp0index.html"
+echo Iniciando VideomakerI.A como Aplicativo Nativo...
 
 :: Inicia o motor de IA local GPU (FastAPI + PyTorch CUDA na porta 8000)
 set PYTHON="C:\Users\Lenovo\AppData\Local\Programs\Python\Python310\python.exe"
@@ -20,20 +17,19 @@ if exist %PYTHON% (
 start /b cmd /c "call npx.cmd serve "%~dp0" -l 3000 >nul 2>&1"
 timeout /t 2 /nobreak >nul
 
-:: Se o Chrome existir, abre como janela de aplicativo nativo (sem abas, sem barra de URL)
+:: Abre no modo App nativo limpo
+set CHROME="C:\Program Files\Google\Chrome\Application\chrome.exe"
+set EDGE="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+
 if exist %CHROME% (
-    start "" %CHROME% --app="http://localhost:3000" --window-size=1280,820 --user-data-dir="%temp%\videomaker_ia_profile"
-    goto fim
+    start "" %CHROME% --app="http://localhost:3000" --window-size=1366,850 --user-data-dir="%temp%\videomaker_ia_profile"
+    exit
 )
 
-:: Caso contrário, usa o Edge nativo do Windows em modo aplicativo
 if exist %EDGE% (
-    start "" %EDGE% --app="http://localhost:3000" --window-size=1280,820 --user-data-dir="%temp%\videomaker_ia_profile"
-    goto fim
+    start "" %EDGE% --app="http://localhost:3000" --window-size=1366,850 --user-data-dir="%temp%\videomaker_ia_profile"
+    exit
 )
 
-:: Fallback se não encontrar os caminhos padrão
 start "" "http://localhost:3000"
-
-:fim
 exit
