@@ -19,10 +19,13 @@ Registro histórico de versões e pontos de recuperação para segurança e roll
 ---
 
 ## 📌 [PR.000] - START INICIAL DA ARQUITETURA
-- **Data e Hora:** 21/10/2026 - 00:23
+- **Data e Hora:** 21/10/2026 - 00:30
 - **Identificador:** PR.000
+- **Hash do Commit:** `cf0d40c` (Branch: `main`)
+- **Repositório GitHub:** https://github.com/Wisterly/VideomakerIA
+- **Deploy Vercel:** https://videomaker-ia.vercel.app
 - **Ambiente:** Desktop App Nativo + PWA Mobile 24/7 (Vercel Ready)
-- **Status:** Estrutura base criada com sucesso, 100% funcional no disco.
+- **Status:** 100% Configurado e Publicado no GitHub e na Vercel com CI/CD contínuo.
 
 ### 📦 O que foi criado e implementado:
 1. **`BLUEPRINT.md`:** Mapeamento arquitetural completo, modelos IA (Seedance 2.5, Kling 1.5, Minimax, Luma) e diagnóstico de VRAM.
